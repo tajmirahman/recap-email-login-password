@@ -26,6 +26,11 @@ const SignUp = () => {
         // strong validation for password
         const passwordRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[\W_]).{6,}$/;
 
+        if(!passwordRegex.test(password)){
+            setError('Password must be one uppercase, one lowercase, one number and one special character !')
+            return;
+        }
+
         createUserWithEmailAndPassword(auth, email, password)
         .then((result)=>{
             console.log(result.user);
@@ -33,6 +38,7 @@ const SignUp = () => {
         })
         .catch(error=>{
             console.log('Error',error.message);
+            setError('Email is already created')
         })
     }
 
@@ -53,7 +59,7 @@ const SignUp = () => {
                 </fieldset>
 
                 {
-                    error && <p className="text-red-500">{error}</p>
+                    error && <p className="text-red-500 text-xl">{error}</p>
                 }
                 {
                     success && <p className="text-green-600 text-xl">{success}</p>

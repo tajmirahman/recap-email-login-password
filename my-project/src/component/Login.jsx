@@ -1,18 +1,19 @@
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { sendPasswordResetEmail, signInWithEmailAndPassword } from "firebase/auth";
 import auth from "../firebase.init";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 
 const Login = () => {
+    const emailRef= useRef();
 
-    const [errorLogin, setErrorLogin]=useState('');
-    const [successLogin, setSuccessLogin]=useState('');
+    const [errorLogin, setErrorLogin] = useState('');
+    const [successLogin, setSuccessLogin] = useState('');
 
 
     const handleLogin = (e) => {
         e.preventDefault();
-        const email= e.target.email.value;
-        const password= e.target.password.value;
+        const email = e.target.email.value;
+        const password = e.target.password.value;
 
         // reset
         setErrorLogin('');
@@ -21,15 +22,30 @@ const Login = () => {
         console.log(email, password);
 
         signInWithEmailAndPassword(auth, email, password)
-        .then(result=>{
-            console.log(result.user)
-            setSuccessLogin('Login Successfully !')
+            .then(result => {
+                console.log(result.user)
+                setSuccessLogin('Login Successfully !')
+            })
+            .catch(error => {
+                console.log("Error", error)
+                setErrorLogin('Email & Password does not match !')
+            })
+    }
+
+    /// forget or reset password
+    const handleForgetPassword=()=>{
+        const email=emailRef.current.value;
+        sendPasswordResetEmail(auth, email)
+        .then(()=>{
+            alert('Email send please check your email')
         })
         .catch(error=>{
-            console.log("Error",error)
-            setErrorLogin('Email & Password does not match !')
+            console.log('Error',error)
         })
     }
+
+
+
 
     return (
         <div className="hero bg-base-200 min-h-screen">
@@ -45,10 +61,15 @@ const Login = () => {
                     <form onSubmit={handleLogin} className="card-body">
                         <fieldset className="fieldset">
                             <label className="fieldset-label">Email</label>
-                            <input type="email" name="email" className="input" placeholder="Email" />
+                            <input type="email" ref={emailRef} name="email" className="input" placeholder="Email" />
+
                             <label className="fieldset-label">Password</label>
-                            <input type="password" name="password"  className="input" placeholder="Password" />
-                            <div><a className="link link-hover">Forgot password?</a></div>
+                            <input type="password" name="password" className="input" placeholder="Password" />
+
+                            <div>
+                                <a onClick={handleForgetPassword} className="link link-hover">Forgot password?</a>
+                            </div>
+
                             <button className="btn btn-neutral mt-4">Login</button>
                         </fieldset>
                         {
